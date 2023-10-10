@@ -24,7 +24,7 @@ const UserSchema = new Schema(
 
     datapersonid: {
       type: String,
-      default: 1,
+      required: true,
     },
   },
   { collection: "guide", timestamps: true }

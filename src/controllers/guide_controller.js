@@ -5,12 +5,14 @@ const addnewPerson = async (req, res, next) => {
     person: req.body.person,
     contact: req.body.contact,
     degree: req.body.degree,
+    datapersonid: req.user.id,
   });
   await newUser.save();
   res.redirect("/");
 };
 const openpersonpage = async (req, res, next) => {
-  const guides = await guide.find();
+  console.log(req.user.id);
+  const guides = await guide.find({ datapersonid: req.user.id });
 
   res.render("index.ejs", { guide: guides });
 };
@@ -24,7 +26,7 @@ const editPerson = async (req, res, next) => {
   const id = req.query.id;
   console.log(id);
   var data = await guide.findOne({ _id: id });
-  const guides = await guide.find();
+  const guides = await guide.find({ datapersonid: req.user.id });
   res.render("edit.ejs", { data: data, guide: guides, query: id });
 };
 const posteditPerson = async (req, res, next) => {

@@ -8,6 +8,7 @@ const nodemailer = require("nodemailer");
 const jwt = require("jsonwebtoken");
 
 const loginFormunuGoster = (req, res, next) => {
+  console.log(res.locals.validation_error);
   res.render("login.ejs");
 };
 const registerFormunuGoster = (req, res, next) => {
@@ -15,6 +16,7 @@ const registerFormunuGoster = (req, res, next) => {
 };
 
 const login = (req, res, next) => {
+  console.log(res.locals.validation_error);
   const hatalar = validationResult(req);
   // console.log(hatalarDizisi);
   req.flash("email", req.body.email);
@@ -42,10 +44,9 @@ const register = async (req, res, next) => {
     req.flash("ad", req.body.ad);
     req.flash("soyad", req.body.soyad);
     req.flash("sifre", req.body.sifre);
-    req.flash("resifre", req.body.resifre);
 
     //console.log(req.session);
-    res.redirect("/register");
+    res.redirect("/signup");
   } else {
     try {
       const _user = await User.findOne({ email: req.body.email });
@@ -56,8 +57,8 @@ const register = async (req, res, next) => {
         req.flash("ad", req.body.ad);
         req.flash("soyad", req.body.soyad);
         req.flash("sifre", req.body.sifre);
-        req.flash("resifre", req.body.resifre);
-        res.redirect("/register");
+
+        res.redirect("/signup");
       } else if ((_user && _user.emailAktif == false) || _user == null) {
         if (_user) {
           await User.findByIdAndRemove({ _id: _user._id });
@@ -268,7 +269,6 @@ const yeniSifreyiKaydet = async (req, res, next) => {
   if (!hatalar.isEmpty()) {
     req.flash("validation_error", hatalar.array());
     req.flash("sifre", req.body.sifre);
-    req.flash("resifre", req.body.resifre);
 
     console.log("formdan gelen değerler");
     console.log(req.body);
