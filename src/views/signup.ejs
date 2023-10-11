@@ -12,8 +12,18 @@
       include('./partials/_mesaj') %> <% } %>
       <div class="form">
         <form action="/signup" method="post" class="login-form">
-          <input name="companyName" type="text" placeholder="Company Name" />
-          <input name="email" type="email" placeholder="Email" />
+          <input
+            value="<%= typeof companyName != 'undefined' ? companyName : ''%>"
+            name="companyName"
+            type="text"
+            placeholder="Company Name"
+          />
+          <input
+            value="<%= typeof email != 'undefined' ? email : ''%>"
+            name="email"
+            type="email"
+            placeholder="Email"
+          />
           <input name="sifre" type="password" placeholder="Password" />
           <button type="submit">Sign Up</button>
           <p class="message">

@@ -41,8 +41,8 @@ const register = async (req, res, next) => {
   if (!hatalar.isEmpty()) {
     req.flash("validation_error", hatalar.array());
     req.flash("email", req.body.email);
-    req.flash("ad", req.body.ad);
-    req.flash("soyad", req.body.soyad);
+    req.flash("companyName", req.body.companyName);
+
     req.flash("sifre", req.body.sifre);
 
     //console.log(req.session);
@@ -54,8 +54,7 @@ const register = async (req, res, next) => {
       if (_user && _user.emailAktif == true) {
         req.flash("validation_error", [{ msg: "Bu mail kullanımda" }]);
         req.flash("email", req.body.email);
-        req.flash("ad", req.body.ad);
-        req.flash("soyad", req.body.soyad);
+        req.flash("companyName", req.body.companyName);
         req.flash("sifre", req.body.sifre);
 
         res.redirect("/signup");
@@ -102,7 +101,8 @@ const register = async (req, res, next) => {
             from: "Guide APP <info@guideapp.com",
             to: newUser.email,
             subject: "Emailiniz Lütfen Onaylayın",
-            text: "Emailinizi onaylamak için lütfen şu linki tıklayın:" + url,
+            text:
+              "Emailinizi onaylamak için lütfen şu linki tıklayın:" + " " + url,
           },
           (error, info) => {
             if (error) {
@@ -126,10 +126,7 @@ const register = async (req, res, next) => {
 };
 
 const forgetPasswordFormunuGoster = (req, res, next) => {
-  res.render("forget_password", {
-    layout: "./layout/auth_layout.ejs",
-    title: "Şifremi Unuttum",
-  });
+  res.render("forget_password", {});
 };
 const forgetPassword = async (req, res, next) => {
   const hatalar = validationResult(req);
@@ -139,7 +136,7 @@ const forgetPassword = async (req, res, next) => {
     req.flash("email", req.body.email);
 
     //console.log(req.session);
-    res.redirect("/forget-password");
+    res.redirect("/forgetpassword");
   }
   //burası calısıyorsa kullanıcı düzgün bir mail girmiştir
   else {
@@ -162,7 +159,7 @@ const forgetPassword = async (req, res, next) => {
         //MAIL GONDERME ISLEMLERI
         const url =
           process.env.WEB_SITE_URL +
-          "reset-password/" +
+          "resetpassword/" +
           _user._id +
           "/" +
           jwtToken;
@@ -180,7 +177,8 @@ const forgetPassword = async (req, res, next) => {
             from: "Nodejs Uygulaması <info@nodejskursu.com",
             to: _user.email,
             subject: "Şifre Güncelleme",
-            text: "Şifrenizi oluşturmak için lütfen şu linki tıklayın:" + url,
+            text:
+              "Şifrenizi oluşturmak için lütfen şu linki tıklayın:" + " " + url,
           },
           (error, info) => {
             if (error) {
@@ -201,7 +199,7 @@ const forgetPassword = async (req, res, next) => {
           { msg: "Bu mail kayıtlı değil veya Kullanıcı pasif" },
         ]);
         req.flash("email", req.body.email);
-        res.redirect("forget-password");
+        res.redirect("/forgetpassword");
       }
       //jwt işlemleri
     } catch (err) {
@@ -273,24 +271,24 @@ const yeniSifreyiKaydet = async (req, res, next) => {
     console.log("formdan gelen değerler");
     console.log(req.body);
     //console.log(req.session);
-    res.redirect("/reset-password/" + req.body.id + "/" + req.body.token);
+    res.redirect("/resetpassword/" + req.body.id + "/" + req.body.token);
   } else {
     const _bulunanUser = await User.findOne({
-      _id: req.body.id,
+      _id: req.params.id.trim(),
       emailAktif: true,
     });
-
+    console.log(_bulunanUser);
     const secret =
       process.env.RESET_PASSWORD_JWT_SECRET + "-" + _bulunanUser.sifre;
 
     try {
-      jwt.verify(req.body.token, secret, async (e, decoded) => {
+      jwt.verify(req.params.token.trim(), secret, async (e, decoded) => {
         if (e) {
           req.flash("error", "Kod Hatalı veya Süresi Geçmiş");
-          res.redirect("/forget-password");
+          res.redirect("/forgetpassword");
         } else {
           const hashedPassword = await bcrypt.hash(req.body.sifre, 10);
-          const sonuc = await User.findByIdAndUpdate(req.body.id, {
+          const sonuc = await User.findByIdAndUpdate(req.params.id.trim(), {
             sifre: hashedPassword,
           });
 
@@ -327,13 +325,11 @@ const yeniSifreFormuGoster = async (req, res, next) => {
       jwt.verify(linktekiToken, secret, async (e, decoded) => {
         if (e) {
           req.flash("error", "Kod Hatalı veya Süresi Geçmiş");
-          res.redirect("/forget-password");
+          res.redirect("/forgetpassword");
         } else {
           res.render("new_password", {
             id: linktekiID,
             token: linktekiToken,
-            layout: "./layout/auth_layout.ejs",
-            title: "Şifre Güncelle",
           });
         }
       });
@@ -343,7 +339,7 @@ const yeniSifreFormuGoster = async (req, res, next) => {
       { msg: "Lütfen maildeki linki tıklayın. Token Bulunamadı" },
     ]);
 
-    res.redirect("forget-password");
+    res.redirect("/forgetpassword");
   }
 };
 

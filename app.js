@@ -47,7 +47,7 @@ app.use((req, res, next) => {
   res.locals.validation_error = req.flash("validation_error");
   res.locals.success_message = req.flash("success_message");
   res.locals.email = req.flash("email");
-
+  res.locals.companyName = req.flash("companyName");
   res.locals.sifre = req.flash("sifre");
 
   res.locals.login_error = req.flash("error");

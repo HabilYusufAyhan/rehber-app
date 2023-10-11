@@ -39,6 +39,21 @@ router.post(
   validatorMiddleware.validateNewUser(),
   authController.register
 );
+router.get("/forgetpassword", authController.forgetPasswordFormunuGoster);
+router.post(
+  "/forgetpassword",
+  validatorMiddleware.validateEmail(),
+  authController.forgetPassword
+);
+
+router.get("/resetpassword/:id/:token", authController.yeniSifreFormuGoster);
+router.get("/resetpassword", authController.yeniSifreFormuGoster);
+router.post(
+  "/resetpassword/:id/:token",
+  validatorMiddleware.validateNewPassword(),
+  authController.yeniSifreyiKaydet
+);
+
 router.get("/verify", authController.verifyMail);
 router.get("/logout", authMiddleware.oturumAcilmis, authController.logout);
 
